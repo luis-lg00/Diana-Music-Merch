@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Diana — Tour</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Arimo:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #F9F9F8;
+      --ink: #111111;
+      --muted: #7A7A7A;
+      --accent: #3B6FD4;
+      --accent-dark: #2A56B0;
+      --alt: #e6931f;
+      --focus: #F0EFFE;
+      --serif: 'Bodoni Moda', 'Cormorant Garamond', Georgia, serif;
+      --sans: 'Arimo', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-weight: 400;
+      font-size: 15px;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── Film Grain Overlay ── */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-size: 80px;
+      animation: grain 0.4s steps(1) infinite;
+    }
+
+    @keyframes grain {
+      0%   { transform: translate(0, 0); }
+      10%  { transform: translate(-3%, -4%); }
+      20%  { transform: translate(2%, 5%); }
+      30%  { transform: translate(-5%, 2%); }
+      40%  { transform: translate(4%, -3%); }
+      50%  { transform: translate(-2%, 6%); }
+      60%  { transform: translate(5%, -1%); }
+      70%  { transform: translate(-4%, 3%); }
+      80%  { transform: translate(3%, -5%); }
+      90%  { transform: translate(-1%, 4%); }
+      100% { transform: translate(2%, -2%); }
+    }
+
+    /* ── Sticky Nav ── */
+    #main-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 48px;
+      background: rgba(249, 249, 248, 0.92);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.3s;
+    }
+
+    #main-nav.scrolled { border-bottom-color: rgba(17, 17, 17, 0.1); }
+
+    .nav-logo {
+      font-family: var(--serif);
+      font-weight: 700;
+      font-size: 18px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 40px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-family: var(--sans);
+      font-weight: 400;
+      font-size: 12px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--muted); }
+    .nav-links a.active { color: var(--accent); }
+
+    @media (min-width: 769px) {
+      .nav-links { display: flex !important; position: static !important; right: auto !important; }
+    }
+
+    /* Hamburger */
+    .nav-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 4px;
+    }
+
+    .nav-toggle span {
+      display: block;
+      width: 24px;
+      height: 1px;
+      background: var(--ink);
+      transition: all 0.3s;
+    }
+
+    /* ── Page Header ── */
+    .page-header {
+      padding: 150px 48px 40px;
+      max-width: 1240px;
+      margin: 0 auto;
+    }
+
+    .page-label {
+      font-family: var(--sans);
+      font-weight: 400;
+      font-size: 10px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+
+    .page-title {
+      font-family: var(--serif);
+      font-weight: 700;
+      font-size: clamp(48px, 9vw, 110px);
+      letter-spacing: -0.02em;
+      line-height: 0.95;
+      text-transform: uppercase;
+    }
+
+    .page-intro {
+      font-family: var(--sans);
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-top: 24px;
+      max-width: 420px;
+    }
+
+    /* ── Tour Section ── */
+    .tour {
+      padding: 40px 48px 120px;
+      max-width: 1240px;
+      margin: 0 auto;
+    }
+
+    .tour-list {
+      border-top: 1px solid rgba(17, 17, 17, 0.1);
+    }
+
+    .tour-row {
+      display: grid;
+      grid-template-columns: 180px 1fr auto;
+      align-items: center;
+      gap: 32px;
+      padding: 36px 8px;
+      border-bottom: 1px solid rgba(17, 17, 17, 0.1);
+      transition: background 0.3s, padding-left 0.3s;
+
+      /* Entrance animation — staggered via inline --i delay */
+      opacity: 0;
+      transform: translateY(28px);
+      animation: row-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation-delay: calc(var(--i, 0) * 0.12s + 0.15s);
+    }
+
+    .tour-row:hover {
+      background: var(--focus);
+      padding-left: 20px;
+    }
+
+    @keyframes row-in {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Respect reduced-motion preferences */
+    @media (prefers-reduced-motion: reduce) {
+      .tour-row {
+        opacity: 1;
+        transform: none;
+        animation: none;
+      }
+    }
+
+    .tour-date {
+      font-family: var(--serif);
+      font-weight: 700;
+      font-size: clamp(28px, 4vw, 42px);
+      line-height: 1;
+      letter-spacing: -0.01em;
+      color: var(--accent);
+      text-transform: uppercase;
+    }
+
+    .tour-date .tour-year {
+      display: block;
+      font-family: var(--sans);
+      font-weight: 400;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
+    .tour-info { min-width: 0; }
+
+    .tour-city {
+      font-family: var(--serif);
+      font-weight: 700;
+      font-size: clamp(20px, 2.6vw, 28px);
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+      margin-bottom: 4px;
+    }
+
+    .tour-venue {
+      font-family: var(--sans);
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .btn-tickets {
+      display: inline-block;
+      font-family: var(--sans);
+      font-weight: 400;
+      font-size: 11px;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: #fff;
+      background: var(--accent);
+      padding: 14px 32px;
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .btn-tickets:hover { background: var(--accent-dark); }
+    .btn-tickets:active { transform: scale(0.97); }
+
+    /* ── Footer ── */
+    footer {
+      padding: 40px 48px;
+      border-top: 1px solid rgba(17,17,17,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1196px;
+      margin: 0 auto;
+    }
+
+    .footer-copy {
+      font-family: var(--sans);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+
+    .footer-links { display: flex; gap: 28px; }
+
+    .footer-links a {
+      font-family: var(--sans);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: var(--ink); }
+
+    /* ── Mobile ── */
+    @media (max-width: 768px) {
+      #main-nav { padding: 20px 24px; }
+      .nav-toggle { display: flex; }
+      .nav-right { gap: 20px; }
+
+      .nav-links {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 70vw;
+        max-width: 300px;
+        height: 100svh;
+        background: var(--bg);
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 60px 40px;
+        gap: 32px;
+        transition: right 0.35s ease;
+        border-left: 1px solid rgba(17,17,17,0.1);
+        z-index: 200;
+      }
+
+      .nav-links.open { right: 0; }
+      .nav-links a { font-size: 14px; letter-spacing: 0.2em; }
+
+      .page-header { padding: 120px 24px 24px; }
+      .tour { padding: 24px 24px 80px; }
+
+      .tour-row {
+        grid-template-columns: 1fr;
+        gap: 14px;
+        padding: 28px 0;
+      }
+      .tour-row:hover { padding-left: 0; }
+
+      .btn-tickets {
+        justify-self: start;
+        padding: 13px 30px;
+      }
+
+      footer {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+        padding: 32px 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Navigation ── -->
+  <nav id="main-nav">
+    <a href="index.html#home" class="nav-logo">Diana</a>
+    <div class="nav-right">
+      <ul class="nav-links" id="nav-links">
+        <li><a href="index.html#home">Home</a></li>
+        <li><a href="index.html#music">Music</a></li>
+        <li><a href="merch.html">Merch</a></li>
+        <li><a href="tour.html" class="active">Tour</a></li>
+      </ul>
+      <button class="nav-toggle" aria-label="Menu" id="nav-toggle">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ── Page Header ── -->
+  <header class="page-header">
+    <p class="page-label">Live</p>
+    <h1 class="page-title">Upcoming Shows</h1>
+    <p class="page-intro">On the road this year. Tickets are limited — secure yours before they're gone.</p>
+  </header>
+
+  <!-- ── Tour Dates ── -->
+  <main class="tour">
+    <div class="tour-list" id="tour-list"><!-- rows injected by JS --></div>
+  </main>
+
+  <!-- ── Footer ── -->
+  <footer>
+    <p class="footer-copy">&copy; 2026 Diana. All rights reserved.</p>
+    <nav class="footer-links" aria-label="Footer navigation">
+      <a href="#">Instagram</a>
+      <a href="#">Facebook</a>
+      <a href="#">X(Twitter)</a>
+      <a href="#">Youtube</a>
+    </nav>
+  </footer>
+
+  <script>
+    // ── Nav: scrolled shadow + mobile drawer ──
+    const nav = document.getElementById('main-nav');
+    const toggle = document.getElementById('nav-toggle');
+    const navLinks = document.getElementById('nav-links');
+
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 10);
+    });
+
+    toggle.addEventListener('click', () => {
+      const open = navLinks.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', open);
+    });
+
+    navLinks.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => {
+        navLinks.classList.remove('open');
+        toggle.setAttribute('aria-expanded', false);
+      });
+    });
+
+    // ── Tour Dates ──
+    const SHOWS = [
+      { month: 'AGO', day: '01', year: '2026', city: 'London, UK',       venue: 'O2 Academy Brixton' },
+      { month: 'AGO', day: '04', year: '2026', city: 'Paris, FR',        venue: 'La Cigale' },
+      { month: 'AGO', day: '08', year: '2026', city: 'Berlin, DE',       venue: 'Astra Kulturhaus' },
+      { month: 'AGO', day: '14', year: '2026', city: 'New York, US',     venue: 'Webster Hall' },
+      { month: 'AGO', day: '21', year: '2026', city: 'Los Angeles, US',  venue: 'The Fonda Theatre' },
+      { month: 'AGO', day: '28', year: '2026', city: 'Tokyo, JP',        venue: 'Zepp DiverCity' },
+    ];
+
+    const list = document.getElementById('tour-list');
+
+    SHOWS.forEach((show, i) => {
+      const row = document.createElement('div');
+      row.className = 'tour-row';
+      row.style.setProperty('--i', i);
+      row.innerHTML = `
+        <div class="tour-date">
+          ${show.month} ${show.day}
+          <span class="tour-year">${show.year}</span>
+        </div>
+        <div class="tour-info">
+          <p class="tour-city">${show.city}</p>
+          <p class="tour-venue">${show.venue}</p>
+        </div>
+        <a class="btn-tickets" href="https://example.com/tickets" target="_blank" rel="noopener">Get Tickets</a>
+      `;
+      list.appendChild(row);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Environment variables (contain Stripe secret keys — never commit)
+.env
+.env.local
+.env.*.local
+
+# Backups / scratch copies
+temp-backup/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Logs
+npm-debug.log*
+*.log

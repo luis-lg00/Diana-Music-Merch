@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Diana — Thank You</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Arimo:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://js.stripe.com/v3/"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #F9F9F8;
+      --ink: #111111;
+      --muted: #7A7A7A;
+      --accent: #3B6FD4;
+      --accent-dark: #2A56B0;
+      --alt: #e6931f;
+      --focus: #F0EFFE;
+      --serif: 'Bodoni Moda', 'Cormorant Garamond', Georgia, serif;
+      --sans: 'Arimo', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-weight: 400;
+      font-size: 15px;
+      line-height: 1.6;
+      min-height: 100svh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Film grain overlay (matches merch page) */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-size: 80px;
+    }
+
+    /* ── Nav ── */
+    #main-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 48px;
+      background: rgba(249, 249, 248, 0.92);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(17, 17, 17, 0.1);
+    }
+
+    .nav-logo {
+      font-family: var(--serif);
+      font-weight: 700;
+      font-size: 18px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 40px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-family: var(--sans);
+      font-weight: 400;
+      font-size: 12px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--muted); }
+
+    /* ── Confirmation ── */
+    .thankyou {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 160px 24px 80px;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .check-badge {
+      width: 84px;
+      height: 84px;
+      border-radius: 50%;
+      background: var(--focus);
+      border: 1px solid rgba(59, 111, 212, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 36px;
+      animation: pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .check-badge svg { width: 40px; height: 40px; }
+    .check-badge svg path {
+      stroke-dasharray: 40;
+      stroke-dashoffset: 40;
+      animation: draw 0.5s 0.25s ease forwards;
+    }
+    @keyframes pop { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+    @keyframes draw { to { stroke-dashoffset: 0; } }
+
+    .thankyou-label {
+      font-family: var(--sans);
+      font-weight: 400;
+      font-size: 10px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    .thankyou-title {
+      font-family: var(--serif);
+      font-weight: 700;
+      font-size: clamp(40px, 8vw, 84px);
+      letter-spacing: -0.02em;
+      line-height: 0.98;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .thankyou-msg {
+      font-family: var(--sans);
+      font-size: 14px;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      max-width: 440px;
+      margin-bottom: 12px;
+    }
+
+    .thankyou-order {
+      font-family: var(--sans);
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      color: var(--ink);
+      margin-bottom: 40px;
+      min-height: 18px;
+    }
+    .thankyou-order span {
+      font-weight: 500;
+      letter-spacing: 0.06em;
+    }
+
+    .btn-shop {
+      display: inline-block;
+      font-family: var(--sans);
+      font-weight: 400;
+      font-size: 11px;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: #fff;
+      background: var(--accent);
+      padding: 16px 44px;
+      border: none;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-shop:hover { background: var(--accent-dark); }
+
+    /* ── Footer ── */
+    footer {
+      padding: 40px 48px;
+      border-top: 1px solid rgba(17,17,17,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 1196px;
+      margin: 0 auto;
+    }
+    .footer-copy {
+      font-family: var(--sans);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+    .footer-links { display: flex; gap: 28px; }
+    .footer-links a {
+      font-family: var(--sans);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--ink); }
+
+    @media (max-width: 768px) {
+      #main-nav { padding: 20px 24px; }
+      .nav-links { gap: 22px; }
+      .thankyou { padding: 130px 24px 60px; }
+      footer {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+        padding: 32px 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Navigation ── -->
+  <nav id="main-nav">
+    <a href="index.html#home" class="nav-logo">Diana</a>
+    <ul class="nav-links">
+      <li><a href="index.html#home">Home</a></li>
+      <li><a href="index.html#music">Music</a></li>
+      <li><a href="merch.html">Merch</a></li>
+      <li><a href="tour.html">Tour</a></li>
+    </ul>
+  </nav>
+
+  <!-- ── Thank You ── -->
+  <main class="thankyou">
+    <div class="check-badge">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 12.5l5 5L20 6.5"/>
+      </svg>
+    </div>
+    <p class="thankyou-label">Order Confirmed</p>
+    <h1 class="thankyou-title">Thank You</h1>
+    <p class="thankyou-msg">Your order is confirmed. A receipt is on its way to your inbox, and your items will be pressed, printed, and packed by hand.</p>
+    <p class="thankyou-order" id="order-ref"></p>
+    <a href="merch.html" class="btn-shop">Continue Shopping</a>
+  </main>
+
+  <!-- ── Footer ── -->
+  <footer>
+    <p class="footer-copy">&copy; 2026 Diana. All rights reserved.</p>
+    <nav class="footer-links" aria-label="Footer navigation">
+      <a href="#">Instagram</a>
+      <a href="#">Facebook</a>
+      <a href="#">X(Twitter)</a>
+      <a href="#">Youtube</a>
+    </nav>
+  </footer>
+
+  <script>
+    // Must match the key used in merch.html
+    const CART_STORAGE_KEY = 'diana-merch-cart';
+    const STRIPE_PUBLISHABLE_KEY = 'pk_test_51TlQytPtmH4KUJO7eB4COjd2JvxJnf3pFmHyn2aEb06uXGqqvZKF8dzc8XPAHWCYgIBG9rYhk53JU6EdUPNgi6HL00FOjeyh9Y';
+
+    function clearCart() {
+      try { localStorage.removeItem(CART_STORAGE_KEY); } catch (e) { /* ignore */ }
+    }
+
+    (async function confirmOrder() {
+      const params = new URLSearchParams(window.location.search);
+      const clientSecret = params.get('payment_intent_client_secret');
+      const orderRefEl = document.getElementById('order-ref');
+
+      // No Stripe params → someone opened this page directly. Still safe to
+      // empty the cart, but don't claim a specific order.
+      if (!clientSecret) {
+        clearCart();
+        return;
+      }
+
+      try {
+        const stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
+        const { paymentIntent } = await stripe.retrievePaymentIntent(clientSecret);
+
+        if (paymentIntent && paymentIntent.status === 'succeeded') {
+          clearCart();
+          orderRefEl.innerHTML = 'Order reference: <span>' + paymentIntent.id + '</span>';
+        } else {
+          // Not succeeded (e.g. processing / failed) — keep the cart so the
+          // customer can retry, and tell them what happened.
+          const status = paymentIntent ? paymentIntent.status : 'unknown';
+          orderRefEl.textContent = 'Payment status: ' + status;
+        }
+      } catch (e) {
+        // Couldn't verify with Stripe; fall back to the redirect_status hint.
+        if (params.get('redirect_status') === 'succeeded') clearCart();
+      }
+    })();
+  </script>
+</body>
+</html>
