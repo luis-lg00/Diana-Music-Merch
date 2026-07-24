@@ -22,7 +22,7 @@ const PRICES = {
   hoodie: 6500, // £65.00
   vinyl:  3000, // £30.00
   poster: 2000, // £20.00
-  hat:    2500, // £25.00
+  hat:    100, // £1.00
 };
 
 const CURRENCY = 'gbp';
