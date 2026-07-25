@@ -31,7 +31,7 @@ is embedded directly in the slide-out cart, so payment fields appear inline when
 ## Test card
 
 Use Stripe's test card: `4242 4242 4242 4242`, any future expiry, any CVC,
-any postcode. On success you're redirected to `/success`.
+any postcode. On success you're redirected to `success.html`.
 
 ## Running detached (no terminal needed)
 
@@ -58,15 +58,38 @@ Get-NetTCPConnection -LocalPort 4242 -ErrorAction SilentlyContinue | ForEach-Obj
 
 ## How it works
 
-- **`server.js`** exposes `POST /create-payment-intent`. The browser sends only
-  the cart contents (product id, size, qty); the **server** looks up prices and
-  computes the amount — the client never dictates the price. Currency is **GBP**.
-- **`merch.html`** calls that endpoint on Checkout, initialises Stripe Elements
+The checkout endpoint is `POST /api/create-payment-intent`. The browser sends
+only the cart contents (product id, size, qty); the **server** looks up prices
+and computes the amount — the client never dictates the price. Currency is
+**GBP**.
+
+- **`lib/pricing.js`** — the single source of truth for prices and the
+  amount calculation. Imported by both the local server and the live function,
+  so prices can never drift between the two.
+- **`server.js`** — the local Express server (used for `npm start` /
+  `localhost`). Serves the static site and the checkout endpoint.
+- **`api/create-payment-intent.js`** — the Vercel serverless function that
+  runs the checkout endpoint on the live site. Vercel does **not** run
+  `server.js`; it serves the static files and this function.
+- **`merch.html`** calls the endpoint on Checkout, initialises Stripe Elements
   with the returned `clientSecret`, and mounts the Payment Element inline in the
   lavender (`#F0EFFE`) checkout area of the cart panel.
 
-## Going live (later)
+## Deploying (Vercel via GitHub)
 
-- Swap test keys for live keys.
+The live site is deployed by pushing to GitHub — Vercel auto-builds from the
+connected repo. The same code runs both locally and live; no per-environment
+changes are needed **except one**:
+
+> **Set `STRIPE_SECRET_KEY` in Vercel's Environment Variables.**
+> `.env` is gitignored (correctly — it holds your secret key), so it does not
+> travel with the push. Without this variable set in Vercel, the live checkout
+> function will fail. Add it under Vercel → Project → Settings →
+> Environment Variables, using the same `sk_test_...` value from your `.env`.
+
+## Going live for real money (later)
+
+- Swap **test** keys for **live** keys (both `.env` / Vercel var **and** the
+  publishable key in `merch.html`).
 - Add a [webhook](https://stripe.com/docs/payments/handling-payment-events) on
   `payment_intent.succeeded` to fulfil orders — don't rely on the redirect alone.

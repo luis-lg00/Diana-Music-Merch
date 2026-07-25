@@ -1414,7 +1414,7 @@
 
       try {
         // 1) Ask our server to create a PaymentIntent (server computes the amount)
-        const res = await fetch('/create-payment-intent', {
+        const res = await fetch('/api/create-payment-intent', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

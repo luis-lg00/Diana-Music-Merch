@@ -8,39 +8,20 @@ require('dotenv').config();
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
+// Shared, server-authoritative pricing — same module the Vercel serverless
+// function uses, so prices never drift between local and live.
+const { CURRENCY, calculateAmount } = require('./lib/pricing');
+
 const app = express();
 app.use(express.json());
 
 // Serve the static site (index.html, merch.html, images, music…)
 app.use(express.static(__dirname));
 
-// ── Server-authoritative price list (in pence) ──
-// NEVER trust amounts sent from the browser — the client tells us *what*
-// is in the cart; the server decides what it *costs*.
-const PRICES = {
-  tshirt: 3500, // £35.00
-  hoodie: 6500, // £65.00
-  vinyl:  3000, // £30.00
-  poster: 2000, // £20.00
-  hat:    100, // £1.00
-};
-
-const CURRENCY = 'gbp';
-
-function calculateAmount(items) {
-  if (!Array.isArray(items) || items.length === 0) {
-    throw new Error('Cart is empty.');
-  }
-  return items.reduce((total, item) => {
-    const unit = PRICES[item.id];
-    if (unit === undefined) throw new Error(`Unknown product: ${item.id}`);
-    const qty = Math.max(1, Math.min(99, parseInt(item.qty, 10) || 1));
-    return total + unit * qty;
-  }, 0);
-}
-
 // ── Create a PaymentIntent for the current cart ──
-app.post('/create-payment-intent', async (req, res) => {
+// Path matches the Vercel serverless function (api/create-payment-intent.js)
+// so the frontend uses one URL in both local and live environments.
+app.post('/api/create-payment-intent', async (req, res) => {
   try {
     const { items } = req.body;
     const amount = calculateAmount(items);
